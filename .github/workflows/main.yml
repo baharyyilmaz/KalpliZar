@@ -1,0 +1,26 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-to-github-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - use: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - name: Publish .NET Core Project
+        run: dotnet publish KalpliZarWeb.csproj -c Release -o release --nologo
+      - name: Change base-tag in index.html from / to Kalpli-Zar
+        run: sed -i 's/<base href="\/" \/>/<base href="\/Kalpli-Zar\/" \/>/g' release/wwwroot/index.html
+      - name: Upload Static Web Assets
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: release/wwwroot
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2

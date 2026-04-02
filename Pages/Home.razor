@@ -1,0 +1,83 @@
+﻿@page "/"
+@using System.Timers
+
+<div style="text-align: center; background-color: mistyrose; min-height: 100vh; padding-top: 50px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <h1 style="color: darkred; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">Kalpli Zar Falı 💖</h1>
+
+    <div style="margin: 30px auto; width: 250px; height: 250px; display: flex; align-items: center; justify-content: center; background: white; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">
+        <img src="images/@suAnkiResim" style="width: 180px; height: 180px; object-fit: contain;" />
+    </div>
+
+    <button class="btn" @onclick="ZarAt" disabled="@isRolling"
+            style="background-color: darkred; color: white; padding: 15px 40px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(139,0,0,0.3); transition: all 0.2s;">
+        @buttonText
+    </button>
+
+    <div style="margin-top: 30px; color: darkred;">
+        <h2 style="font-weight: bold;">@sonucMetni</h2>
+    </div>
+</div>
+
+@code {
+    private string suAnkiResim = "zar1.png";
+    private string sonucMetni = "Bakalım bugün şansına ne gelecek?";
+    private string buttonText = "Zar At!";
+    private bool isRolling = false;
+    private Random rastgele = new Random();
+    private Timer donmeTimer;
+    private int sayac = 0;
+
+    private void ZarAt()
+    {
+        isRolling = true;
+        buttonText = "Zarlar Dönüyor...";
+        sonucMetni = "Bekle ve gör...";
+        sayac = 0;
+
+        donmeTimer = new Timer(60); // Hız ayarı
+        donmeTimer.Elapsed += async (s, e) =>
+        {
+            await InvokeAsync(DonmeEfekti);
+        };
+        donmeTimer.Start();
+    }
+
+    private void DonmeEfekti()
+    {
+        // Dönme sırasında rastgele resimler göster (Hızlı değişim illüzyonu)
+        int gecici = rastgele.Next(1, 7);
+        suAnkiResim = ZarResminiBelirle(gecici);
+
+        sayac++;
+
+        if (sayac > 25) // 25 kez resim değiştikten sonra dur
+        {
+            donmeTimer.Stop();
+            donmeTimer.Dispose();
+
+            // GERÇEK SONUÇ BURADA ÜRETİLİYOR
+            int finalZar = rastgele.Next(1, 7);
+            suAnkiResim = ZarResminiBelirle(finalZar);
+            sonucMetni = $"Gelen Zar: {finalZar} ❤️";
+            buttonText = "Tekrar At!";
+            isRolling = false;
+        }
+        StateHasChanged();
+    }
+
+    // SENİN SORUNUNU ÇÖZEN KRİTİK BÖLÜM:
+    // Hangi sayı gelirse hangi resmin görüneceğini buradan ayarla
+    private string ZarResminiBelirle(int sayi)
+    {
+        return sayi switch
+        {
+            1 => "zar6.png", // 1 gelirse içinde 1 kalp olan resmi çağır
+            2 => "zar5.png", // 2 gelirse içinde 2 kalp olan resmi çağır
+            3 => "zar4.png",
+            4 => "zar3.png",
+            5 => "zar2.png",
+            6 => "zar1.png", // 6 gelirse içinde 6 kalp olan resmi çağır
+            _ => "zar1.png"
+        };
+    }
+}
